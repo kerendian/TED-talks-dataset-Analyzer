@@ -1,7 +1,7 @@
 import pandas as pd
 import ast
 
-table = pd.read_csv("ted_main.txt") 
+#table = pd.read_csv("ted_main.txt")
 
 """
 A class used to represent a TED talks dataset Analyzer.
@@ -104,10 +104,69 @@ class TedAnalyzer:
     def filter_by_row(self,column_name,treshold):
         df = self.data
         return df[df[column_name] > treshold].dropna()
-    
 
+    """
+    Method that parse the rating_x data of each TED Talk and adds a new column for rating_x data 
+    param rating_x: specific rating from the ratings can be given by TED talks viewers
+    """
+    def parse_rating(self, rating_x):
+        rate = []
+        data = self.data
+        # Loop over all talks in dataframe
+        for ll in range(len(data)):
+            # First we split on the rating of interest and subsequent splits work to isolate the rating counts
+            splitting = data['ratings'][ll].split(rating_x)
+            splitting2 = splitting[1].split(':')
+            splitting3 = splitting2[1].split(" ")
+            splitting4 = splitting3[1].split("}")
+            # Isolate number of ratings
+            rate.append(splitting4[0])
+            series = pd.Series(rate)
+            # Create column in dataframe for rating
+            data[rating_x] = series
 
+    # list of all ratings
+    ratings = ['Funny', 'Beautiful', 'Ingenious', 'Courageous', 'Longwinded', 'Confusing',
+               'Informative', 'Fascinating', 'Unconvincing', 'Persuasive', 'Jaw-dropping', 'OK',
+               'Obnoxious', 'Inspiring']
+    """
+    Method that adds cols for all possible ratings
+    param ratings: list of all possible ratings
+    """
+    def add_rating_cols(self, ratings):
+        for rating in ratings:
+            self.parse_rating(rating)
+        return self.data[ratings]
 
+    # Categorize the ratings into the three broad categories
+    positive = ['Funny', 'Beautiful', 'Ingenious', 'Courageous', 'Inspiring', 'Jaw-dropping', 'Fascinating']
+    negative = ['Longwinded', 'Unconvincing', 'Obnoxious', 'Confusing']
+    moderate = ['Informative', 'OK', 'Persuasive']
+    """
+    Method that adds new cols to the data for each category of t he ratings: positive, negative, moderate. 
+    And sum the ratings appropriately
+    param ratings: list of all possible ratings
+    """
+    def count_ratings_by_category(self, ratings):
+        #Convert ratings from string to integers so we can use mathematical operations
+        self.data[ratings] = self.data[ratings].astype(int)
+        #Create new columns that sum the ratings appropriately
+        self.data['Positive'] = self.data['Informative'] + self.data['Persuasive'] + self.data['Funny'] + self.data['Beautiful'] + self.data['Ingenious'] + self.data['Courageous'] + self.data['Inspiring'] + self.data['Jaw-dropping'] + self.data['Fascinating']
+        self.data['Moderate'] = self.data['OK']
+        self.data['Negative'] = self.data['Longwinded'] + self.data['Unconvincing'] + self.data['Obnoxious'] + self.data['Confusing']
 
+    """
+     Method that describe statistics for each category: count, mean, std, min, 25%, 50%, 75%, max
+     """
+    def describe_category_statistics(self):
+        return self.data[['Positive', 'Moderate', 'Negative']].describe()
 
-
+'''
+ratings = ['Funny', 'Beautiful', 'Ingenious', 'Courageous', 'Longwinded', 'Confusing',
+           'Informative', 'Fascinating', 'Unconvincing', 'Persuasive', 'Jaw-dropping', 'OK',
+           'Obnoxious', 'Inspiring']
+test = TedAnalyzer("ted_main.csv")
+test.add_rating_cols(ratings)
+test.count_ratings_by_category(ratings)
+print(test.describe_category_statistics())
+'''
