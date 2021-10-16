@@ -117,6 +117,8 @@ class TedAnalyzer:
         self.data['published_date'] = self.data['published_date'].apply(
             lambda x: datetime.datetime.fromtimestamp(int(x)).strftime('%d-%m-%Y'))
     """
+    Whenever you view a TED talk you have the option of leaving behind a review of how you liked the talk. 
+    These ratings are a great metric of how successful a TED talk is. 
     Method that parse the rating_x data of each TED Talk and adds a new column for rating_x data 
     param rating_x: specific rating from the ratings can be given by TED talks viewers
     """
@@ -162,7 +164,8 @@ class TedAnalyzer:
         #Convert ratings from string to integers so we can use mathematical operations
         self.data[ratings] = self.data[ratings].astype(int)
         #Create new columns that sum the ratings appropriately
-        self.data['Positive'] = self.data['Informative'] + self.data['Persuasive'] + self.data['Funny'] + self.data['Beautiful'] + self.data['Ingenious'] + self.data['Courageous'] + self.data['Inspiring'] + self.data['Jaw-dropping'] + self.data['Fascinating']
+        self.data['Positive'] = self.data['Informative'] + self.data['Persuasive'] + self.data['Funny'] + self.data['Beautiful'] \
+                                + self.data['Ingenious'] + self.data['Courageous'] + self.data['Inspiring'] + self.data['Jaw-dropping'] + self.data['Fascinating']
         self.data['Moderate'] = self.data['OK']
         self.data['Negative'] = self.data['Longwinded'] + self.data['Unconvincing'] + self.data['Obnoxious'] + self.data['Confusing']
 
@@ -172,7 +175,9 @@ class TedAnalyzer:
     def describe_category_statistics(self):
         return self.data[['Positive', 'Moderate', 'Negative']].describe()
 
-
+    """
+    Method to create a new column that shows the mean number of views from all the related talks listed for a given talk.
+    """
     def mean_views_related_talks(self):
         self.data['related_views'] = 0
         for ii in range(len(self.data)):
@@ -227,4 +232,23 @@ test = TedAnalyzer("ted_main.csv")
 pop_talks1 = test.fifteen_most_popular_ted_talks()
 # print(pop_talks1)
 test.visualize_number_of_ted_talks_through_the_years()
+"""
+
+"""
+Conclusions¶
+There are a few important features that affect views substantially. TED could use these findings to optimize their selection of speakers. They are as follows:
+
+Features that yield a positive effect
+
+Religion Tag: Controversy between religion and atheism and its implementation in schooling
+Scientific views Tag: Introduce lay people to scientific advancements
+Vices Tag: People like to watch others go out on a limb and take a stand
+Event Type: Scale of audience
+
+Features that yield a negative effect
+
+Music: People don’t want TED to become the radio
+Middle East, Global Issues, Epidemics: TED is seen as a positive idea platform and not necessarily a place for a news site
+TEDx: Local topics generate conversation not views
+Arts/Creativity: This is thought provoking but doesn’t necessarily spark conversation
 """
