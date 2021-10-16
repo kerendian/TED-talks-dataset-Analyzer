@@ -213,7 +213,7 @@ class TedAnalyzer:
         sns.pointplot(x='year', y='talks', data=year_df)
         plt.show()
 
-
+"""
 ratings = ['Funny', 'Beautiful', 'Ingenious', 'Courageous', 'Longwinded', 'Confusing',
            'Informative', 'Fascinating', 'Unconvincing', 'Persuasive', 'Jaw-dropping', 'OK',
            'Obnoxious', 'Inspiring']
@@ -227,3 +227,4 @@ test = TedAnalyzer("ted_main.csv")
 pop_talks1 = test.fifteen_most_popular_ted_talks()
 # print(pop_talks1)
 test.visualize_number_of_ted_talks_through_the_years()
+"""
