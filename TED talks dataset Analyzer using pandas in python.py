@@ -1,6 +1,9 @@
 import pandas as pd
 import ast
-
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import datetime
 #table = pd.read_csv("ted_main.txt")
 
 """
@@ -105,6 +108,14 @@ class TedAnalyzer:
         df = self.data
         return df[df[column_name] > treshold].dropna()
 
+
+    """
+    Method to convert the Unix timestamps into a human readable format.
+    """
+    def convert_unix_to_datetime(self):
+        self.data['film_date'] = self.data['film_date'].apply(lambda x: datetime.datetime.fromtimestamp(int(x)).strftime('%d-%m-%Y'))
+        self.data['published_date'] = self.data['published_date'].apply(
+            lambda x: datetime.datetime.fromtimestamp(int(x)).strftime('%d-%m-%Y'))
     """
     Method that parse the rating_x data of each TED Talk and adds a new column for rating_x data 
     param rating_x: specific rating from the ratings can be given by TED talks viewers
@@ -161,12 +172,58 @@ class TedAnalyzer:
     def describe_category_statistics(self):
         return self.data[['Positive', 'Moderate', 'Negative']].describe()
 
-'''
+
+    def mean_views_related_talks(self):
+        self.data['related_views'] = 0
+        for ii in range(len(self.data)):
+            # Remove string
+            less = ast.literal_eval(self.data['related_talks'][ii])
+            related_views = []
+            for ll in range(len(less)):
+                # Add view counts for each related talk into list
+                related_views.append(less[ll]['viewed_count'])
+                self.data[['related_views']][ii] = np.mean(related_views)
+    """
+    Method to check what the 15 most viewed TED talks of all time.
+    """
+    def fifteen_most_popular_ted_talks(self):
+        pop_talks = self.data[['title', 'main_speaker', 'views', 'film_date']].sort_values('views', ascending=False)[:15]
+        return pop_talks
+
+    """
+    Method that makes a bar chart to visualise these 15 talks in terms of the number of views they garnered.
+    """
+    def plot_number_of_most_popular_talks(self ,pop_talks):
+        pop_talks['abbr'] = pop_talks['main_speaker'].apply(lambda x: x[:3])
+        sns.set_style("whitegrid")
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x='abbr', y='views', data=pop_talks)
+        plt.show()
+
+
+    """
+    Method to visualize the number of TED talks through the years and check if our hunch that they have grown significantly is indeed true.
+    """
+    def visualize_number_of_ted_talks_through_the_years(self):
+        self.convert_unix_to_datetime()
+        self.data['year'] = self.data['film_date'].apply(lambda x: x.split('-')[2]) #apply lambda function on each film date that splits the year out
+        year_df = pd.DataFrame(self.data['year'].value_counts().reset_index())
+        year_df.columns = ['year', 'talks']
+        plt.figure(figsize=(18, 5))
+        sns.pointplot(x='year', y='talks', data=year_df)
+        plt.show()
+
+
 ratings = ['Funny', 'Beautiful', 'Ingenious', 'Courageous', 'Longwinded', 'Confusing',
            'Informative', 'Fascinating', 'Unconvincing', 'Persuasive', 'Jaw-dropping', 'OK',
            'Obnoxious', 'Inspiring']
 test = TedAnalyzer("ted_main.csv")
-test.add_rating_cols(ratings)
-test.count_ratings_by_category(ratings)
-print(test.describe_category_statistics())
-'''
+# test.add_rating_cols(ratings)
+# test.count_ratings_by_category(ratings)
+# test.mean_views_related_talks()
+# print(test.data['related_views'])
+
+
+pop_talks1 = test.fifteen_most_popular_ted_talks()
+# print(pop_talks1)
+test.visualize_number_of_ted_talks_through_the_years()
