@@ -5,7 +5,7 @@ There are a few important features that affect views substantially.
 
 TED could use these findings to optimize their selection of speakers. They are as follows:
 
-# Features that yield a positive effect
+## Features that yield a positive effect
 
 **Religion Tag:** Controversy between religion and atheism and its implementation in schooling
 
@@ -15,7 +15,7 @@ TED could use these findings to optimize their selection of speakers. They are a
 
 **Event Type:** Scale of audience
 
-# Features that yield a negative effect
+## Features that yield a negative effect
 
 **Music:** People don’t want TED to become the radio
 
